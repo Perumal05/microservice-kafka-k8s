@@ -190,7 +190,7 @@ See:
 Kafka UI provides a convenient dashboard for inspecting the Kafka cluster, brokers, topics and partitions.
 
 <p align="center">
-  <img src="images/kafka-ui-dashboard.png" alt="Kafka UI Dashboard" width="850">
+  <img src="images/kafka.png" alt="Kafka UI Dashboard" width="850">
 </p>
 
 ---
