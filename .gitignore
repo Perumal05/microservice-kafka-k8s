@@ -1,0 +1,85 @@
+# =========================================================
+# Environment variables / local configuration
+# =========================================================
+
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Environment folders
+.env/
+.env.local/
+.env.development/
+.env.production/
+
+
+# =========================================================
+# Secrets
+# =========================================================
+
+*.secret
+*.secrets
+*.key
+*.pem
+
+# Kubernetes local secret files
+k8s/secrets/*
+
+# Keep a safe example/template if you create one
+!k8s/secrets/README.md
+!k8s/secrets/*.example
+!k8s/secrets/*.template
+
+
+# =========================================================
+# Java / Spring Boot
+# =========================================================
+
+target/
+*.class
+*.jar
+*.war
+
+# Spring Boot generated files
+spring.log
+*.log
+
+
+# =========================================================
+# IDE
+# =========================================================
+
+.idea/
+*.iml
+
+.vscode/
+.settings/
+.project
+.classpath
+
+
+# =========================================================
+# OS
+# =========================================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# =========================================================
+# Build / temporary files
+# =========================================================
+
+build/
+out/
+tmp/
+temp/
+
+
+# =========================================================
+# Docker #
+# =========================================================
+
+docker-compose.override.yml

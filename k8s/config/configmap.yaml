@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shopsphere-config
+  namespace: shopsphere
+data:
+  MYSQL_HOST: "mysql"
+  MYSQL_PORT: "3306"
+
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:29092"
+
+  PRODUCT_SERVICE_URL: "http://product-service:4002"
+  INVENTORY_SERVICE_URL: "http://inventory-service:4005"
+  PAYMENT_SERVICE_URL: "http://payment-service:4006"
+  CART_SERVICE_URL: "http://cart-service:4003"
+
+  HTTP_CONNECT_TIMEOUT_MS: "2000"
+  HTTP_READ_TIMEOUT_MS: "3000"
+
+  PAYMENT_SIMULATION_TIMEOUT_MS: "2000"

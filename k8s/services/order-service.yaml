@@ -1,0 +1,165 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: shopsphere
+  labels:
+    app: order-service
+    app.kubernetes.io/name: order-service
+    app.kubernetes.io/part-of: shopsphere
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: order-service
+
+  template:
+    metadata:
+      labels:
+        app: order-service
+        app.kubernetes.io/name: order-service
+        app.kubernetes.io/part-of: shopsphere
+
+    spec:
+      containers:
+        - name: order-service
+          image: shopsphere/order-service:0.1
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 4004
+              protocol: TCP
+
+          env:
+            - name: SERVER_PORT
+              value: "4004"
+
+            # Database
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://mysql:3306/shopsphere_order?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "root"
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shopsphere-secrets
+                  key: MYSQL_ROOT_PASSWORD
+
+            # Kafka
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-config
+                  key: KAFKA_BOOTSTRAP_SERVERS
+
+            # Microservice URLs
+            - name: PRODUCT_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-config
+                  key: PRODUCT_SERVICE_URL
+
+            - name: INVENTORY_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-config
+                  key: INVENTORY_SERVICE_URL
+
+            - name: PAYMENT_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-config
+                  key: PAYMENT_SERVICE_URL
+
+            - name: CART_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-config
+                  key: CART_SERVICE_URL
+
+            # HTTP timeouts
+            - name: HTTP_CONNECT_TIMEOUT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-config
+                  key: HTTP_CONNECT_TIMEOUT_MS
+
+            - name: HTTP_READ_TIMEOUT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-config
+                  key: HTTP_READ_TIMEOUT_MS
+
+            - name: PAYMENT_SIMULATION_TIMEOUT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-config
+                  key: PAYMENT_SIMULATION_TIMEOUT_MS
+
+            # JVM memory tuning
+            - name: JAVA_TOOL_OPTIONS
+              value: >-
+                -XX:MaxRAMPercentage=35
+                -XX:InitialRAMPercentage=10
+                -Xss256k
+
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "300Mi"
+
+          # Startup can take time; don't kill it while Spring Boot initializes
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 40
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: shopsphere
+  labels:
+    app: order-service
+    app.kubernetes.io/name: order-service
+    app.kubernetes.io/part-of: shopsphere
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: order-service
+
+  ports:
+    - name: http
+      port: 4004
+      targetPort: 4004
+      protocol: TCP

@@ -1,0 +1,110 @@
+ShopSphere - Environment Variable Reference
+===============================================
+
+IMPORTANT
+---------
+This file is for reference only. For local Docker Compose, use a real .env file.
+Do not commit .env to GitHub. Commit .env.example instead.
+
+The Spring Boot application.properties files use:
+    ${ENV_VAR:default-value}
+
+Docker Compose can load .env and pass values into the containers.
+Kubernetes can later provide the same variables using ConfigMap and Secret.
+
+1. COMMON DATABASE VARIABLES
+----------------------------
+SPRING_DATASOURCE_USERNAME=root
+
+Each service has its own default database URL:
+
+user-service:
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/shopsphere_user?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+product-service:
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/shopsphere_product?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+cart-service:
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/shopsphere_cart?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+order-service:
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/shopsphere_order?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+inventory-service:
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/shopsphere_inventory?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+payment-service:
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/shopsphere_payment?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+notification-service:
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/shopsphere_notification?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+Database password:
+SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+
+2. KAFKA
+--------
+KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+
+Default used by Spring Boot when the variable is not supplied:
+localhost:9092
+
+In Docker Compose:
+kafka:29092
+
+In Kubernetes:
+kafka:29092
+
+3. SERVICE URLS
+---------------
+PRODUCT_SERVICE_URL=http://localhost:4002
+INVENTORY_SERVICE_URL=http://localhost:4005
+PAYMENT_SERVICE_URL=http://localhost:4006
+CART_SERVICE_URL=http://localhost:4003
+
+Kubernetes values will normally be the same service names:
+PRODUCT_SERVICE_URL=http://product-service:4002
+INVENTORY_SERVICE_URL=http://inventory-service:4005
+PAYMENT_SERVICE_URL=http://payment-service:4006
+CART_SERVICE_URL=http://cart-service:4003
+
+4. HTTP TIMEOUTS
+----------------
+HTTP_CONNECT_TIMEOUT_MS=2000
+HTTP_READ_TIMEOUT_MS=3000
+
+5. PAYMENT SIMULATION
+---------------------
+PAYMENT_SIMULATION_TIMEOUT_MS=2000
+
+6. SERVER PORTS
+---------------
+user-service=4001
+product-service=4002
+cart-service=4003
+order-service=4004
+inventory-service=4005
+payment-service=4006
+notification-service=4007
+
+Recommended application.properties syntax:
+server.port=${SERVER_PORT:4001}
+
+Change the default port number for each service.
+
+7. SECURITY
+-----------
+Sensitive values such as:
+- MYSQL_ROOT_PASSWORD
+- SPRING_DATASOURCE_PASSWORD
+- JWT secrets
+- Supabase keys
+- API keys
+
+should NOT be hard-coded in application.properties or committed to GitHub.
+
+Local Docker Compose:
+.env -> docker-compose.yml -> container environment -> Spring Boot
+
+Kubernetes:
+Secret/ConfigMap -> container environment -> Spring Boot
